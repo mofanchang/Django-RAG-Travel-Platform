@@ -1,0 +1,48 @@
+/* 確保內容不會過於收縮 */
+* {
+    box-sizing: border-box;
+}
+
+/* 調整主要容器 */
+.container {
+    width: 100%;
+    max-width: 1200px; /* 可選：設置最大寬度 */
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* 移除最小寬度限制 */
+input, button, section {
+    min-width: 0 !important;
+}
+
+/* 響應式網格佈局 */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr; /* 預設單欄 */
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(4, 1fr); /* 螢幕寬度大於768px時顯示4欄 */
+    }
+}
+
+/* 確保按鈕和輸入框適應 */
+input[type="text"], input[type="date"], button {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #3b82f6;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #2563eb;
+}

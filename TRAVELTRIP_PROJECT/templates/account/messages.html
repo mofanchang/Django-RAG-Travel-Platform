@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}訊息{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-24 p-8 bg-white rounded-2xl shadow text-center">
+    {% for message in messages %}
+    <div class="mb-4 text-lg {% if message.tags == 'success' %}text-green-600{% else %}text-gray-700{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-full font-semibold transition">
+        回首頁
+    </a>
+</div>
+{% endblock %}

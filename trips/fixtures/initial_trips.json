@@ -1,0 +1,272 @@
+[
+  {
+    "model": "trips.trip",
+    "pk": 1,
+    "fields": {
+      "name": "東京經典五日遊",
+      "description": "探索東京必訪景點，涵蓋淺草寺、新宿、原宿、澀谷、台場，感受日本現代都市與傳統文化的完美融合，還有豐富的街頭美食體驗。",
+      "price": "18900.00",
+      "image": "tokyo.jpg",
+      "start_date": "2025-08-01",
+      "end_date": "2025-08-05",
+      "available_seats": 20,
+      "location": "東京",
+      "duration": 5,
+      "country": "日本",
+      "city": "東京",
+      "keywords": "東京,城市,購物,美食,文化,淺草寺"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 2,
+    "fields": {
+      "name": "京都奈良賞楓七日遊",
+      "description": "深度漫步京都千年古都，造訪金閣寺、嵐山竹林、伏見稻荷，再前往奈良餵小鹿，感受日本秋天最浪漫的紅葉季節。",
+      "price": "26900.00",
+      "image": "sika-deer-7868590_640.jpg",
+      "start_date": "2025-11-05",
+      "end_date": "2025-11-11",
+      "available_seats": 15,
+      "location": "京都",
+      "duration": 7,
+      "country": "日本",
+      "city": "京都",
+      "keywords": "京都,奈良,賞楓,金閣寺,鹿,文化,秋天"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 3,
+    "fields": {
+      "name": "大阪美食探索四日遊",
+      "description": "以吃貨之都大阪為中心，品嚐道頓堀章魚燒、大阪燒、黑門市場海鮮，並造訪環球影城，體驗關西人的熱情與活力。",
+      "price": "17900.00",
+      "image": "takoyaki-5143845_640.jpg",
+      "start_date": "2025-08-10",
+      "end_date": "2025-08-13",
+      "available_seats": 18,
+      "location": "大阪",
+      "duration": 4,
+      "country": "日本",
+      "city": "大阪",
+      "keywords": "大阪,美食,章魚燒,環球影城,購物,熱鬧"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 4,
+    "fields": {
+      "name": "沖繩海島度假五日遊",
+      "description": "沉浸沖繩湛藍海水，造訪美麗海水族館、古宇利島跨海大橋、首里城遺址，享受南國島嶼的悠閒風情與新鮮海產。",
+      "price": "22900.00",
+      "image": "okinawa-3421799_640.jpg",
+      "start_date": "2025-09-01",
+      "end_date": "2025-09-05",
+      "available_seats": 18,
+      "location": "沖繩",
+      "duration": 5,
+      "country": "日本",
+      "city": "沖繩",
+      "keywords": "沖繩,海島,潛水,水族館,度假,海灘,珊瑚"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 5,
+    "fields": {
+      "name": "沖繩風獅爺文化三日遊",
+      "description": "深入探索沖繩獨特的琉球文化，尋訪各地風獅爺石像，體驗傳統泡盛酒文化，漫步那霸國際通市場。",
+      "price": "14900.00",
+      "image": "shisa-787031_640.jpg",
+      "start_date": "2025-09-10",
+      "end_date": "2025-09-12",
+      "available_seats": 20,
+      "location": "沖繩",
+      "duration": 3,
+      "country": "日本",
+      "city": "沖繩那霸",
+      "keywords": "沖繩,風獅爺,琉球文化,那霸,傳統,文化"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 6,
+    "fields": {
+      "name": "北海道小樽浪漫四日遊",
+      "description": "漫步小樽運河石造倉庫群，品嚐北海道新鮮海鮮丼與牛奶冰淇淋，感受明治時代的歐式浪漫氛圍與北國獨特風情。",
+      "price": "21900.00",
+      "image": "otaru-4782372_640.jpg",
+      "start_date": "2025-10-01",
+      "end_date": "2025-10-04",
+      "available_seats": 12,
+      "location": "北海道",
+      "duration": 4,
+      "country": "日本",
+      "city": "小樽",
+      "keywords": "北海道,小樽,運河,海鮮,浪漫,秋天,夜景"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 7,
+    "fields": {
+      "name": "神戶港都異國三日遊",
+      "description": "探訪神戶異人館洋風建築群、六甲山百萬夜景、北野坂歐式街道，品嚐世界頂級神戶牛排，感受日本最具異國風情的港口城市。",
+      "price": "15900.00",
+      "image": "kobe-2411665_640.jpg",
+      "start_date": "2025-08-20",
+      "end_date": "2025-08-22",
+      "available_seats": 20,
+      "location": "神戶",
+      "duration": 3,
+      "country": "日本",
+      "city": "神戶",
+      "keywords": "神戶,夜景,牛排,異人館,港口,歐風"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 8,
+    "fields": {
+      "name": "日本富士山周邊五日遊",
+      "description": "近距離眺望雄偉的富士山，遊覽河口湖、忍野八海清澈湧泉、箱根溫泉，感受日本最具代表性的自然景觀與溫泉文化。",
+      "price": "23900.00",
+      "image": "japan-3664500_640.jpg",
+      "start_date": "2025-10-10",
+      "end_date": "2025-10-14",
+      "available_seats": 16,
+      "location": "富士山",
+      "duration": 5,
+      "country": "日本",
+      "city": "富士山",
+      "keywords": "富士山,溫泉,河口湖,箱根,自然,秋天"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 9,
+    "fields": {
+      "name": "首爾韓流購物五日遊",
+      "description": "暢遊首爾明洞、弘大、東大門夜市，品嚐韓式烤肉、炸雞、年糕串，體驗K-POP韓流文化與最新街頭時尚潮流。",
+      "price": "16900.00",
+      "image": "gwanghwamun-636115_640.jpg",
+      "start_date": "2025-08-05",
+      "end_date": "2025-08-09",
+      "available_seats": 25,
+      "location": "首爾",
+      "duration": 5,
+      "country": "韓國",
+      "city": "首爾",
+      "keywords": "首爾,韓國,購物,韓流,明洞,弘大,K-POP"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 10,
+    "fields": {
+      "name": "韓國烤肉美食深度四日遊",
+      "description": "專為美食愛好者設計，深入體驗韓式烤肉、部隊鍋、冷麵、炸雞配啤酒，走訪首爾傳統市場與在地餐廳，大口吃肉大口喝酒。",
+      "price": "14900.00",
+      "image": "korean-barbecue-8579177_640.jpg",
+      "start_date": "2025-09-15",
+      "end_date": "2025-09-18",
+      "available_seats": 20,
+      "location": "首爾",
+      "duration": 4,
+      "country": "韓國",
+      "city": "首爾",
+      "keywords": "韓國,烤肉,美食,炸雞,部隊鍋,市場"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 11,
+    "fields": {
+      "name": "濟州島自然奇景四日遊",
+      "description": "探索世界自然遺產濟州島，登上漢拿山、造訪城山日出峰火山口、涉地可支海岸，感受大自然鬼斧神工的火山地貌。",
+      "price": "14900.00",
+      "image": "jeju-island-6889156_640.jpg",
+      "start_date": "2025-09-20",
+      "end_date": "2025-09-23",
+      "available_seats": 20,
+      "location": "濟州島",
+      "duration": 4,
+      "country": "韓國",
+      "city": "濟州",
+      "keywords": "濟州島,自然,火山,健行,海岸,世界遺產"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 12,
+    "fields": {
+      "name": "仁川首爾港灣三日遊",
+      "description": "從仁川國際機場出發，探索仁川唐人街、松月洞童話村、月尾島，感受首爾近郊的港灣風情與多元文化交融的特色街區。",
+      "price": "12900.00",
+      "image": "incheon-port-7111061_640.jpg",
+      "start_date": "2025-10-05",
+      "end_date": "2025-10-07",
+      "available_seats": 22,
+      "location": "仁川",
+      "duration": 3,
+      "country": "韓國",
+      "city": "仁川",
+      "keywords": "仁川,港口,唐人街,童話村,短途,文化"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 13,
+    "fields": {
+      "name": "台北宜蘭文化五日遊",
+      "description": "漫步台北故宮博物院、九份老街、饒河夜市，再前往宜蘭蘭陽博物館、冬山河親水公園，品嚐牛肉麵、小籠包等道地台灣美食。",
+      "price": "9900.00",
+      "image": "lanyang-museum-1784871_640.jpg",
+      "start_date": "2025-08-15",
+      "end_date": "2025-08-19",
+      "available_seats": 30,
+      "location": "台北",
+      "duration": 5,
+      "country": "台灣",
+      "city": "台北",
+      "keywords": "台北,宜蘭,故宮,九份,夜市,美食,文化"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 14,
+    "fields": {
+      "name": "高雄墾丁陽光四日遊",
+      "description": "探索高雄駁二藝術特區、愛河遊船夜景、旗津海鮮，再南下墾丁白沙灣戲水、鵝鑾鼻燈塔，盡享南台灣陽光沙灘與海洋風情。",
+      "price": "8900.00",
+      "image": "kaohsiung-2728058_640.jpg",
+      "start_date": "2025-09-05",
+      "end_date": "2025-09-08",
+      "available_seats": 25,
+      "location": "高雄",
+      "duration": 4,
+      "country": "台灣",
+      "city": "高雄",
+      "keywords": "高雄,墾丁,海灘,藝術,夜景,海鮮,陽光"
+    }
+  },
+  {
+    "model": "trips.trip",
+    "pk": 15,
+    "fields": {
+      "name": "台灣山水自然三日遊",
+      "description": "深入台灣壯麗山河，造訪太魯閣國家公園大理石峽谷、清水斷崖、合歡山高山景觀，感受台灣最震撼人心的自然奇景。",
+      "price": "7900.00",
+      "image": "mountain-river-2060394_640.jpg",
+      "start_date": "2025-10-15",
+      "end_date": "2025-10-17",
+      "available_seats": 18,
+      "location": "花蓮",
+      "duration": 3,
+      "country": "台灣",
+      "city": "花蓮",
+      "keywords": "花蓮,太魯閣,山景,峽谷,自然,健行,清水斷崖"
+    }
+  }
+]

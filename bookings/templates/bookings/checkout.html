@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}結帳{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">結帳頁面</h2>
+
+<p>請確認您要購買的項目，然後完成結帳流程。</p>
+
+{% if items %}
+<table class="w-full mb-4 border-collapse">
+    <thead>
+        <tr class="bg-gray-100">
+            <th class="text-left p-2 border">行程名稱</th>
+            <th class="text-left p-2 border">出發日期</th>
+            <th class="text-right p-2 border">價格</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td class="p-2 border">{{ item.trip.name }}</td>
+            <td class="p-2 border">{{ item.trip.start_date }}</td>
+            <td class="p-2 border text-right">NT$ {{ item.trip.price }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr class="font-bold">
+            <td colspan="2" class="p-2 border text-right">總金額</td>
+            <td class="p-2 border text-right">NT$ {{ total }}</td>
+        </tr>
+    </tfoot>
+</table>
+{% else %}
+<p class="text-gray-500">購物車是空的</p>
+{% endif %}
+
+{% if trips %}
+<form action="{% url 'bookings:create_booking' %}" method="post" class="inline">
+    {% csrf_token %}
+    <button type="submit"
+        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">
+         確認並建立訂單
+    </button>
+</form>
+<a href="{% url 'cart_view' %}" class="ml-3 text-gray-500 hover:text-gray-700 underline text-sm">← 返回購物車</a>
+{% endif %}
+{% endblock %}

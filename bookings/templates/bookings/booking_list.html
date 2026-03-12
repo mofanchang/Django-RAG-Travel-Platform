@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}我的訂單{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h2 class="text-2xl font-bold mb-6">我的訂單</h2>
+
+    {% if bookings %}
+    <div class="space-y-4">
+        {% for booking in bookings %}
+        <div class="bg-white border rounded-lg shadow p-5 hover:shadow-md transition">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <p class="font-semibold text-lg">#{{ booking.id }}</p>
+                    <p class="text-gray-500 text-sm">{{ booking.created_atdate:"Y-m-d H:i" }}</p>
+                </div>
+                <span class="px-3 py-1 rounded-full text-sm font-semibold
+                    {% if booking.status == 'Completed' %}bg-green-100 text-green-700
+                    {% elif booking.status == 'Cancelled' %}bg-red-100 text-red-700
+                    {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                    {{ booking.status }}
+                </span>
+            </div>
+
+            <!-- 行程預覽 -->
+            <div class="mb-3 text-gray-600 text-sm">
+                {% for item in booking.items.all %}
+                <span class="inline-block bg-gray-100 rounded px-2 py-1 mr-1 mb-1">{{ item.trip.name }}</span>
+                {% empty %}
+                <span class="text-gray-400">無行程明細</span>
+                {% endfor %}
+            </div>
+
+            <div class="flex justify-between items-center">
+                <p class="font-bold text-blue-600">NT$ {{ booking.total }}</p>
+                <a href="{% url 'bookings:booking_detail' booking.id %}" class="text-blue-600 hover:underline text-sm">查看詳情 →</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-16 text-gray-500">
+        <p class="text-xl mb-4">你目前沒有任何訂單</p>
+        <a href="{% url 'trips:trip_list' %}" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">探索行程</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

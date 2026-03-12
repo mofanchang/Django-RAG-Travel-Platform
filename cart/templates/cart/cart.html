@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}購物車{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h2 class="text-2xl font-bold mb-6">購物車</h2>
+
+    {% if items %}
+    <div class="bg-white border rounded-lg shadow p-6 mb-4">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b text-gray-500 text-sm">
+                    <th class="text-left pb-2">行程</th>
+                    <th class="text-center pb-2">出發日期</th>
+                    <th class="text-right pb-2">價格</th>
+                    <th class="text-right pb-2"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr class="border-b">
+                    <td class="py-3">
+                        <a href="{% url 'trips:trip_detail' item.trip.pk %}"
+                            class="text-blue-600 hover:underline font-medium">
+                            {{ item.trip.name }}
+                        </a>
+                        <p class="text-gray-500 text-sm">{{ item.trip.city }}, {{ item.trip.country }}</p>
+                    </td>
+                    <td class="py-3 text-center text-gray-600">{{ item.trip.start_date }}</td>
+                    <td class="py-3 text-right font-semibold">NT$ {{ item.trip.price }}</td>
+                    <td class="py-3 text-right">
+                        <form action="{% url 'remove_from_cart' item.trip.id %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-500 hover:text-red-700 text-sm">移除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2" class="pt-4 text-right font-bold">總金額</td>
+                    <td class="pt-4 text-right font-bold text-blue-600">NT$ {{ total }}</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="flex justify-between">
+        <form action="{% url 'clear_cart' %}" method="post" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="text-gray-500 hover:text-gray-700 text-sm underline">清空購物車</button>
+        </form>
+        <a href="{% url 'bookings:checkout' %}"
+            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">前往結帳</a>
+    </div>
+
+    {% else %}
+    <div class="text-center py-16 text-gray-500">
+        <p class="text-xl mb-4">購物車是空的</p>
+        <a href="{% url 'trips:trip_list' %}"
+            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">探索行程</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}搜尋結果 - TRAVELTRIP{% endblock %}
+
+{% block content %}
+<section class="mb-12">
+  <h2 class="text-3xl font-bold text-center mb-6">搜尋結果</h2>
+
+  {% if trips %}
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {% for trip in trips %}
+    <div class="bg-white rounded-lg shadow-lg hover:shadow-xl transition">
+      <div class="h-40 bg-gradient-to-r from-green-400 to-blue-500"></div>
+      <div class="p-4">
+        <h3 class="text-xl font-bold mb-2">{{ trip.name }}</h3>
+        <p class="text-gray-500 text-sm mb-2">{{ trip.city }}, {{ trip.country }}</p>
+        <p class="text-gray-600 mb-2">{{ trip.descriptiontruncatewords:10 }}</p>
+        <div class="flex justify-between items-center">
+          <span class="text-xl font-bold text-blue-600">NT$ {{ trip.price }}</span>
+          <a href="{% url 'trips:trip_detail' trip.pk %}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">詳情</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p class="text-center text-gray-500">查無相關行程。</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,45 @@
+graph TD
+    User((使用者))
+    
+    subgraph Frontend ["前端 (React)"]
+        App[React 應用程式]
+        ChatWidget[AI 聊天視窗]
+    end
+
+    subgraph Backend ["後端 (Django)"]
+        Auth[使用者認證]
+        Trips[行程管理]
+        Cart[購物車]
+        Bookings[訂單系統]
+        Chatbot[RAG 聊天服務]
+        Payments[PayPal 支付整合]
+    end
+
+    subgraph External ["外部服務"]
+        Google[Google OAuth]
+        PayPal[PayPal API]
+    end
+
+    subgraph Storage ["資料儲存與 AI"]
+        DB[(PostgreSQL)]
+        Embeddings[向量索引]
+    end
+
+    User --> App
+    App --> ChatWidget
+    App --> Auth
+    App --> Trips
+    App --> Cart
+    App --> Bookings
+    
+    Auth <--> Google
+    Bookings --> Payments
+    Payments <--> PayPal
+    
+    ChatWidget <--> Chatbot
+    Chatbot --> Embeddings
+    
+    Auth --> DB
+    Trips --> DB
+    Cart --> DB
+    Bookings --> DB

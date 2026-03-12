@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}探索世界 - TRAVELTRIP{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-24 mb-12 rounded-2xl text-center">
+    <h1 class="text-5xl font-bold mb-4">探索世界的美好</h1>
+    <p class="text-xl mb-8 text-blue-100">發現新奇目的地，享受難忘旅程</p>
+    <a href="{% url 'trips:trip_list' %}" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-semibold text-lg transition">
+        開始探索
+    </a>
+</section>
+
+<!-- 搜尋區 -->
+<section class="bg-white p-8 rounded-2xl shadow-lg mb-12">
+    <h2 class="text-2xl font-bold text-center mb-6">規劃您的旅程</h2>
+    <form method="post" action="{% url 'trips:trip_search' %}">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">目的地</label>
+                <input type="text" name="destination" placeholder="輸入地點" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">出發日期</label>
+                <input type="date" name="start_date" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">回程日期</label>
+                <input type="date" name="end_date" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-semibold transition">
+                    搜尋行程
+                </button>
+            </div>
+        </div>
+    </form>
+</section>
+
+<!-- 熱門行程 -->
+<section class="mb-12">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold">熱門行程</h2>
+        <a href="{% url 'trips:trip_list' %}" class="text-blue-600 hover:underline text-sm">查看全部 →</a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for trip in trips %}
+        <div class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
+            <div class="h-48 overflow-hidden">
+                {% if trip.image %}
+                <img src="{{ trip.image.url }}" alt="{{ trip.name }}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
+                {% else %}
+                <div class="w-full h-full bg-gradient-to-r from-blue-400 to-purple-500"></div>
+                {% endif %}
+            </div>
+            <div class="p-5">
+                <h3 class="text-lg font-bold mb-1">{{ trip.name }}</h3>
+                <p class="text-gray-500 text-sm mb-2">{{ trip.city }}, {{ trip.country }} · {{ trip.duration }} 天</p>
+                <p class="text-gray-600 text-sm mb-4">{{ trip.descriptiontruncatechars:60 }}</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-blue-600 font-bold text-lg">NT$ {{ trip.price }}</span>
+                    <a href="{% url 'trips:trip_detail' trip.pk %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">
+                        查看詳情
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-gray-500 col-span-3 py-10">目前沒有行程，請稍後再來。</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- 特色服務 -->
+<section class="bg-white p-8 rounded-2xl shadow mb-12">
+    <h2 class="text-3xl font-bold text-center mb-8">為何選擇我們</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="text-center">
+            <div class="w-14 h-14 bg-blue-100 rounded-full mx-auto mb-3 flex items-center justify-center">
+                <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path></svg>
+            </div>
+            <h3 class="font-bold mb-1">優惠價格</h3>
+            <p class="text-gray-500 text-sm">最低價保證，物超所值</p>
+        </div>
+        <div class="text-center">
+            <div class="w-14 h-14 bg-green-100 rounded-full mx-auto mb-3 flex items-center justify-center">
+                <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h3 class="font-bold mb-1">安全保障</h3>
+            <p class="text-gray-500 text-sm">全程保險，安心出發</p>
+        </div>
+        <div class="text-center">
+            <div class="w-14 h-14 bg-purple-100 rounded-full mx-auto mb-3 flex items-center justify-center">
+                <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </div>
+            <h3 class="font-bold mb-1">專業導遊</h3>
+            <p class="text-gray-500 text-sm">在地專家，深度體驗</p>
+        </div>
+        <div class="text-center">
+            <div class="w-14 h-14 bg-orange-100 rounded-full mx-auto mb-3 flex items-center justify-center">
+                <svg class="w-7 h-7 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path></svg>
+            </div>
+            <h3 class="font-bold mb-1">客製行程</h3>
+            <p class="text-gray-500 text-sm">量身打造，個人化設計</p>
+        </div>
+    </div>
+</section>
+
+<!-- 客戶見證 -->
+<section class="mb-12">
+    <h2 class="text-3xl font-bold text-center mb-8">旅客好評</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow">
+            <div class="text-yellow-400 mb-2"></div>
+            <p class="text-gray-600 mb-4">"行程安排完美，導遊非常專業，服務優良！絕對會再來。"</p>
+            <p class="font-semibold text-gray-800">王小明</p>
+            <p class="text-gray-400 text-sm">東京五日遊</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow">
+            <div class="text-yellow-400 mb-2"></div>
+            <p class="text-gray-600 mb-4">"價格合理，品質超出預期，整個行程都很順暢，強力推薦！"</p>
+            <p class="font-semibold text-gray-800">李美麗</p>
+            <p class="text-gray-400 text-sm">首爾韓流之旅</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow">
+            <div class="text-yellow-400 mb-2"></div>
+            <p class="text-gray-600 mb-4">"客製化行程讓我們全家都玩得很盡興，小朋友也愛極了！"</p>
+            <p class="font-semibold text-gray-800">陳大華</p>
+            <p class="text-gray-400 text-sm">沖繩親子遊</p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white p-12 rounded-2xl text-center mb-8">
+    <h2 class="text-3xl font-bold mb-3">準備好出發了嗎？</h2>
+    <p class="text-blue-100 mb-6">立即瀏覽我們精選的行程，找到最適合你的旅程</p>
+    <a href="{% url 'trips:trip_list' %}" class="bg-white text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-full font-semibold text-lg transition">
+        瀏覽所有行程
+    </a>
+</section>
+
+{% endblock %}
