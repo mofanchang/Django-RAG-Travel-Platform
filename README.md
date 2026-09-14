@@ -1,6 +1,31 @@
-## 中文版
+# Django-RAG-Travel-Platform
 
 Django-RAG-Travel-Platform 是一個旅遊電商平台，核心是訂單結帳的高併發交易處理，並整合一套自製語意搜尋引擎作為輔助功能。
+
+## 系統架構圖
+
+```mermaid
+flowchart LR
+    U[使用者] --> F[React / Django Templates]
+    F --> W[Django Web Application]
+
+    W --> A[Auth: Session / JWT / RBAC]
+    W --> P[REST API & Swagger]
+    W --> DB[(PostgreSQL)]
+    W --> R[(Redis)]
+    W --> G[RAG Service<br/>FastAPI + Vector Index]
+
+    B[Celery Beat] --> Q[Celery Worker]
+    Q --> R
+    Q --> DB
+    Q --> G
+
+    G --> M[Chinese Sentence Transformer]
+
+    DB --> T[Trips / Restaurants]
+    DB --> O[Cart / Bookings]
+    DB --> C[Conversation Logs]
+```
 
 **技術堆疊**
 
@@ -11,32 +36,112 @@ Django-RAG-Travel-Platform 是一個旅遊電商平台，核心是訂單結帳�
 | 前端 | React |
 | 異步任務 | Celery + Redis |
 | 快取 | django-redis |
-| 身份驗證 | django-allauth（密碼 + Google OAuth，session-based） |
+| 身份驗證 | django-allauth（密碼 + Google OAuth，session-based）+ JWT（DRF API 替代認證） |
 | 金流 | PayPal Checkout Server SDK |
 | 語意搜尋（輔助） | FastAPI + Sentence Transformer |
 
 **後端核心設計**
 
 1. **高併發防超賣機制**
+
    結帳時用 `transaction.atomic()` + `select_for_update()` 對 Trip 資料列悲觀鎖定；所有交易強制依 Trip ID 固定升冪順序取鎖，避免不同購物車組合並行結帳時互相等待造成死鎖。訂單建立時設定 `reservation_expires_at`，逾期未付款由背景任務自動釋放庫存。
 
+   ```mermaid
+   sequenceDiagram
+       actor User as 使用者
+       participant Web as Django Web
+       participant DB as PostgreSQL
+
+       User->>Web: 提交結帳
+       Web->>DB: 開始 transaction
+       Web->>DB: SELECT ... FOR UPDATE 鎖定行程
+       Web->>DB: 驗證與扣減可用座位
+       Web->>DB: 建立 Booking / BookingItem
+       Web->>DB: Commit
+       Web-->>User: 顯示訂單詳情
+   ```
+
 2. **Celery + Redis 異步任務架構**
+
    訂單確認信、超時未付款回收庫存等耗時任務移到背景執行，避免阻塞主執行緒；`django-redis` 快取熱門行程列表與查詢結果，降低 PostgreSQL 讀取壓力。RAG 索引更新也走這套排程機制：只處理有異動的項目，失敗時保留待處理標記，交由下次排程自動重試。
 
-3. **身份驗證與安全**
-   bcrypt 加鹽雜湊密碼，django-allauth 整合 Google OAuth 2.0，內建 Session CSRF 防護。
+   對話歷史查詢採 Cache-Aside 模式：先查 Redis，沒命中才查資料庫並寫回快取（TTL 1 小時）；新對話寫入後主動清除該使用者快取，避免讀到過期資料。
+
+   ```mermaid
+   sequenceDiagram
+       actor User as 使用者
+       participant UI as Web UI
+       participant Django as Django API
+       participant Redis as Redis Cache
+       participant DB as PostgreSQL
+
+       User->>UI: 開啟聊天紀錄
+       UI->>Django: GET /api/chatbot/history/
+       Django->>Redis: GET user:{id}:chat_history
+
+       alt 快取命中
+           Redis-->>Django: 已快取的歷史紀錄
+       else 快取未命中
+           Redis-->>Django: 無資料
+           Django->>DB: 查詢 ConversationLog 與推薦項目
+           DB-->>Django: 歷史紀錄
+           Django->>Redis: SET 歷史紀錄，TTL 1 小時
+       end
+
+       Django-->>UI: 回傳歷史紀錄
+       UI-->>User: 顯示過往對話
+   ```
+
+3. **API 速率限制與安全**
+
+   聊天 API 內建 IP 限流（每分鐘 10 次），超過回 429；身份驗證支援 Session 與 JWT 雙軌並存，未登入直接擋在業務邏輯之前回 401；bcrypt 加鹽雜湊密碼，django-allauth 整合 Google OAuth 2.0，內建 CSRF 防護。
+
+   ```mermaid
+   flowchart TD
+       A[收到聊天 POST 請求] --> B{已登入？}
+       B -- 否 --> U[401 Unauthorized]
+       B -- 是 --> C{超過速率限制？}
+       C -- 是 --> L[429 Too Many Requests]
+       C -- 否 --> D{輸入格式有效？}
+       D -- 否 --> V[400 Bad Request]
+       D -- 是 --> E[呼叫 RAG Service]
+       E --> F{RAG 可用？}
+       F -- 否 --> S[503 Service Unavailable]
+       F -- 是 --> G[組合推薦結果並寫入對話紀錄]
+       G --> H[200 OK]
+       E -. 未預期例外 .-> X[500 Internal Server Error]
+   ```
 
 4. **服務拆分**
+
    語意搜尋獨立成 FastAPI 微服務，透過 HTTP 與主系統通訊，讓核心 Django 服務不需背負 torch 等大型 ML 套件依賴。
 
 **輔助功能：語意搜尋（RAG）**
 
 使用者可用自然語言輸入需求（如「適合親子的東南亞行程」），系統將查詢向量化後用餘弦相似度比對行程資料庫，回傳最相關的推薦，不依賴外部 LLM API。模型用 `shibing624/text2vec-base-chinese`（Hugging Face），輕量、CPU 可跑、開源免費。
 
-**系統架構**
+```mermaid
+sequenceDiagram
+    actor User as 使用者
+    participant UI as Web UI
+    participant Django as Django API
+    participant RAG as RAG Service
+    participant DB as PostgreSQL
+
+    User->>UI: 輸入旅遊需求
+    UI->>Django: POST /api/chatbot/query/
+    Django->>RAG: 語意搜尋
+    RAG-->>Django: 相似項目與分數
+    Django->>DB: 讀取仍有效的行程／餐廳
+    Django->>DB: 寫入對話紀錄
+    Django-->>UI: 回覆與推薦結果
+    UI-->>User: 顯示推薦卡片
+```
+
+**目錄結構**
 ```
 Django-RAG-Travel-Platform/
-├── accounts/       # 使用者認證（django-allauth，session-based + Google OAuth）
+├── accounts/       # 使用者認證（django-allauth，session-based + Google OAuth + JWT）
 ├── trips/          # 旅遊行程 CRUD 與搜尋
 ├── cart/           # 購物車（資料庫模型 Cart / CartItem，非 session）
 ├── bookings/       # 訂單管理，含悲觀鎖交易邏輯（booking_create.py）
@@ -53,12 +158,12 @@ GET /trips/api/?page=1
 ```
 完整 API 文件（Swagger）：/api/docs/
 
-使用者登入（Google OAuth 流程）
+使用者登入
 ```
 GET /accounts/google/login/
 GET /accounts/google/login/callback/
 ```
-登入狀態以 Django session 維持，不使用 JWT。另提供 `POST /user/api/login/` 供 API 測試工具直接登入。
+登入狀態預設以 Django session（sessionid cookie）維持；同時 DRF API 另外支援 Bearer JWT 作為替代認證方式（`Authorization: Bearer <token>`），依前端需求擇一使用。另提供 `POST /user/api/login/` 供 API 測試工具（如 Postman）以 email/password 直接登入，預設回傳 session cookie。
 
 **技術挑戰與解決方案**
 
@@ -83,6 +188,9 @@ pip install -r requirements-basic.txt
 
 授權：MIT License
 
+---
+
+中文版先给你确认排版跟内容对不对，确认没问题我再补英文版（结构一样，五张图放同样的位置）。
 ---
 
 ## English
