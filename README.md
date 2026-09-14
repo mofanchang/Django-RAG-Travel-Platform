@@ -189,13 +189,36 @@ pip install -r requirements-basic.txt
 授權：MIT License
 
 ---
+Here's the English version, same structure and diagram placement:## English
 
-中文版先给你确认排版跟内容对不对，确认没问题我再补英文版（结构一样，五张图放同样的位置）。
----
-
-## English
+# Django-RAG-Travel-Platform
 
 Django-RAG-Travel-Platform is a travel e-commerce platform whose core is high-concurrency transaction handling for checkout, with a self-built semantic search engine as a supporting feature.
+
+## System Architecture
+
+```mermaid
+flowchart LR
+    U[User] --> F[React / Django Templates]
+    F --> W[Django Web Application]
+
+    W --> A[Auth: Session / JWT / RBAC]
+    W --> P[REST API & Swagger]
+    W --> DB[(PostgreSQL)]
+    W --> R[(Redis)]
+    W --> G[RAG Service<br/>FastAPI + Vector Index]
+
+    B[Celery Beat] --> Q[Celery Worker]
+    Q --> R
+    Q --> DB
+    Q --> G
+
+    G --> M[Chinese Sentence Transformer]
+
+    DB --> T[Trips / Restaurants]
+    DB --> O[Cart / Bookings]
+    DB --> C[Conversation Logs]
+```
 
 **Tech Stack**
 
@@ -206,32 +229,112 @@ Django-RAG-Travel-Platform is a travel e-commerce platform whose core is high-co
 | Frontend | React |
 | Async tasks | Celery + Redis |
 | Caching | django-redis |
-| Auth | django-allauth (password + Google OAuth, session-based) |
+| Auth | django-allauth (password + Google OAuth, session-based) + JWT (alternative DRF API auth) |
 | Payments | PayPal Checkout Server SDK |
 | Semantic search (supporting) | FastAPI + Sentence Transformer |
 
 **Backend Design Highlights**
 
 1. **Concurrency-safe checkout (overselling prevention)**
+
    Checkout uses `transaction.atomic()` + `select_for_update()` to pessimistically lock `Trip` rows. All transactions acquire locks in a fixed ascending order by Trip ID, preventing deadlocks when different carts checkout concurrently with overlapping trips. Each booking sets `reservation_expires_at`; a background task automatically releases inventory if payment isn't completed in time.
 
-2. **Celery + Redis async task architecture**
-   Slow operations (confirmation emails, releasing inventory on expired unpaid orders) run in the background instead of blocking the main thread. `django-redis` caches popular trip listings and query results to reduce read pressure on PostgreSQL. The RAG index update pipeline reuses this same scheduling pattern: only changed items are re-processed, and failed items are flagged for automatic retry on the next scheduled run.
+   ```mermaid
+   sequenceDiagram
+       actor User
+       participant Web as Django Web
+       participant DB as PostgreSQL
 
-3. **Auth & security**
-   bcrypt salted password hashing, django-allauth with Google OAuth 2.0, built-in session CSRF protection.
+       User->>Web: Submit checkout
+       Web->>DB: Begin transaction
+       Web->>DB: SELECT ... FOR UPDATE (lock trip)
+       Web->>DB: Validate & deduct available seats
+       Web->>DB: Create Booking / BookingItem
+       Web->>DB: Commit
+       Web-->>User: Show order detail
+   ```
+
+2. **Celery + Redis async task architecture**
+
+   Slow operations (confirmation emails, releasing inventory on expired unpaid orders) run in the background instead of blocking the main thread. `django-redis` caches popular trip listings and query results. The RAG index update pipeline reuses this same scheduling pattern: only changed items are re-processed, and failures are flagged for automatic retry on the next scheduled run.
+
+   Chat history lookups use a Cache-Aside pattern: check Redis first, fall back to the database on a miss and write the result back with a 1-hour TTL; the cache is actively invalidated after each new message so users never see stale history.
+
+   ```mermaid
+   sequenceDiagram
+       actor User
+       participant UI as Web UI
+       participant Django as Django API
+       participant Redis as Redis Cache
+       participant DB as PostgreSQL
+
+       User->>UI: Open chat history
+       UI->>Django: GET /api/chatbot/history/
+       Django->>Redis: GET user:{id}:chat_history
+
+       alt Cache hit
+           Redis-->>Django: Cached history
+       else Cache miss
+           Redis-->>Django: No data
+           Django->>DB: Query ConversationLog & recommended items
+           DB-->>Django: History records
+           Django->>Redis: SET history, TTL 1 hour
+       end
+
+       Django-->>UI: Return history
+       UI-->>User: Display past conversation
+   ```
+
+3. **Rate limiting & security**
+
+   The chat API has built-in per-IP rate limiting (10 requests/minute, returns 429 when exceeded); auth supports both Session and JWT, with unauthenticated requests rejected before reaching business logic (401); bcrypt salted password hashing; django-allauth with Google OAuth 2.0; built-in CSRF protection.
+
+   ```mermaid
+   flowchart TD
+       A[Receive chat POST request] --> B{Authenticated?}
+       B -- No --> U[401 Unauthorized]
+       B -- Yes --> C{Rate limit exceeded?}
+       C -- Yes --> L[429 Too Many Requests]
+       C -- No --> D{Valid input format?}
+       D -- No --> V[400 Bad Request]
+       D -- Yes --> E[Call RAG Service]
+       E --> F{RAG available?}
+       F -- No --> S[503 Service Unavailable]
+       F -- Yes --> G[Assemble recommendation & log conversation]
+       G --> H[200 OK]
+       E -. Unexpected exception .-> X[500 Internal Server Error]
+   ```
 
 4. **Service separation**
+
    Semantic search runs as an independent FastAPI microservice over HTTP, keeping heavy ML dependencies like torch out of the core Django service.
 
 **Supporting feature: semantic search (RAG)**
 
 Users can describe what they want in natural language (e.g. "family-friendly trip to Southeast Asia"). The query is vectorized and matched against the trip database via cosine similarity — no external LLM API call needed. Model: `shibing624/text2vec-base-chinese` (Hugging Face) — lightweight, CPU-only, open-source.
 
-**Architecture**
+```mermaid
+sequenceDiagram
+    actor User
+    participant UI as Web UI
+    participant Django as Django API
+    participant RAG as RAG Service
+    participant DB as PostgreSQL
+
+    User->>UI: Enter travel request
+    UI->>Django: POST /api/chatbot/query/
+    Django->>RAG: Semantic search
+    RAG-->>Django: Similar items & scores
+    Django->>DB: Read still-available trips/restaurants
+    Django->>DB: Log conversation
+    Django-->>UI: Reply with recommendations
+    UI-->>User: Show recommendation cards
+```
+
+**Directory Structure**
 ```
 Django-RAG-Travel-Platform/
-├── accounts/       # Auth (django-allauth, session-based + Google OAuth)
+├── accounts/       # Auth (django-allauth, session-based + Google OAuth + JWT)
 ├── trips/          # Trip CRUD & search
 ├── cart/           # Cart (Cart / CartItem DB models, not session-based)
 ├── bookings/       # Order management, incl. pessimistic-lock transaction logic (booking_create.py)
@@ -248,12 +351,12 @@ GET /trips/api/?page=1
 ```
 Full API docs (Swagger): /api/docs/
 
-Login (Google OAuth flow)
+Login
 ```
 GET /accounts/google/login/
 GET /accounts/google/login/callback/
 ```
-Login state is maintained via a Django session — no JWT is issued. A `POST /user/api/login/` endpoint is also available for direct email/password login via API testing tools.
+Login state defaults to a Django session (sessionid cookie); DRF APIs additionally support Bearer JWT as an alternative authentication method (`Authorization: Bearer <token>`), selectable depending on the frontend's needs. A `POST /user/api/login/` endpoint is also available for API testing tools (e.g. Postman) via email/password, which returns a session cookie by default.
 
 **Key Technical Challenges**
 
